@@ -1,26 +1,30 @@
-name: Update SnigelWeb Loader Script
+name: Update SnigelWeb Loader URL and Remove GTM Noscript Block
 
 on:
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
-  update_loader_url:
+  update_loader_and_remove_gtm:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Update SnigelWeb Loader URLs
+    - name: Update SnigelWeb Loader URL
       run: |
-        find . -type f -not -path "./.github/*" -exec sed -i 's|\.\./cdn\.snigelweb\.com/adengine/w3schools\.com/loader\.js|https://cdn.snigelweb.com/adengine/w3schools.com/loader.js|g' {} +
+        find . -type f -not -path "./.github/*" -exec sed -i 's|../https://cdn.snigelweb.com/adengine/w3schools.com/loader.js|https://cdn.snigelweb.com/adengine/w3schools.com/loader.js|g' {} +
+
+    - name: Remove GTM noscript block
+      run: |
+        find . -type f -not -path "./.github/*" -exec sed -i '/<!-- Google Tag Manager (noscript) -->/,/<!-- End Google Tag Manager (noscript) -->/d' {} +
 
     - name: Commit changes
       run: |
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
         git add .
-        git commit -m "Update SnigelWeb loader URL" || echo "No changes to commit"
+        git commit -m "Update SnigelWeb loader URL and remove GTM noscript block" || echo "No changes to commit"
 
     - name: Push changes
       run: git push
